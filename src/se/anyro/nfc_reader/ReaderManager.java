@@ -5,6 +5,6 @@ import android.nfc.Tag;
 
 public final class ReaderManager {
 	public static Card readCard(Tag tag) {
-		
+		final Card card = new Card();
 	}
 }

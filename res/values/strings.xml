@@ -20,4 +20,19 @@
     <string name="error">Error</string>
     <string name="no_nfc">No NFC found on this device</string>
     <string name="nfc_disabled">NFC is not enabled. Please go to the wireless settings to enable it.</string>
+    
+    <string name="spec_prop_id">Application</string>
+    <string name="spec_prop_serial">Serial:\u0020</string>
+    <string name="spec_prop_param">Parameter:\u0020</string>
+    <string name="spec_prop_version">Version:\u0020</string>
+    <string name="spec_prop_date">Validity:\u0020</string>
+    <string name="spec_prop_currency">Currency:\u0020</string>
+    <string name="spec_prop_count">Transactions:\u0020</string>
+    <string name="spec_prop_ecash">E-Cash:\u0020</string>
+    <string name="spec_prop_balance">Balance:\u0020</string>
+    <string name="spec_prop_tlimit">EC Single Transaction Limit:\u0020</string>
+    <string name="spec_prop_dlimit">EC Balance Limit:\u0020</string>
+    <string name="spec_prop_translog">Transaction Logs:</string>
+    <string name="spec_prop_access">Access denied</string>
+    <string name="spec_prop_exception">Error:</string>
 </resources>
