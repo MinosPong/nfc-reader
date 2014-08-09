@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- * Copyright (C) 2011 Adam Nybäck
+ * Copyright (C) 2011 Adam Nyb��ck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,6 +158,7 @@ public class TagViewer extends Activity {
                 byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
                 Parcelable tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 byte[] payload = dumpTagData(tag).getBytes();
+                Card card = ReaderManager.readCard((Tag)tag);
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, id, payload);
                 NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
                 msgs = new NdefMessage[] { msg };
