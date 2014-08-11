@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import se.anyro.nfc_reader.SPEC;
+import se.anyro.nfc_reader.bean.Application;
 import se.anyro.nfc_reader.bean.Card;
 import se.anyro.nfc_reader.tech.Iso7816;
 import se.anyro.nfc_reader.tech.Iso7816.BerHouse;
@@ -21,6 +22,8 @@ public class Quickpass extends StandardPboc {
 		0x33, 0x01, 0x01, 0x02 };
 	protected final static byte[] AID_QUASI_CREDIT = { (byte) 0xA0, 0x00, 0x00,
 		0x03, 0x33, 0x01, 0x01, 0x03 };
+	
+	public final static short MARK_LOG = (short) 0xDFFF;
 	
 	protected final static short[] TAG_GLOBAL = { (short) 0x9F79 /* 电子现金金额 */,
 		(short) 0x9F78 /* 电子现金单笔上限 */, (short) 0x9F77 /* 电子现金余额上限 */,
@@ -75,7 +78,16 @@ public class Quickpass extends StandardPboc {
             // (遍历过程一般不会超过15个文件就会结束)
 			/*--------------------------------------------------------------*/
 			collectTLVFromRecords(tag, subTLVs);
+			
+			final Application app = createApplication();
+			parseInfo(app, subTLVs);
+			parseLogs(app, subTLVs);
+			card.addApplication(app);
 		}
+	}
+	
+	private static void parseInfo(Application app, BerHouse tlvs) {
+		Object prop = parseString(tlvs, (short)0x5A);
 	}
 	
 	private ArrayList<Iso7816.ID> getApplicationIds(Iso7816.StdTag tag) throws IOException {
@@ -131,6 +143,31 @@ public class Quickpass extends StandardPboc {
 				BerTLV.extractPrimitives(tlvs, r);
 				r = tag.readRecord(sfi, idx);
 			}
+		}
+		
+		// check if already get sfi of log file
+		BerTLV logEntry = tlvs.findFirst((short) 0x9F4D);
+		
+		final int S, E;
+		if (logEntry != null && logEntry.length() == 2) {
+			S = E = logEntry.v.getBytes()[0] & 0x000000FF;
+		} else {
+			S = 11;
+			E = 31;
+		}
+		
+		// log files
+		for (int sfi = S; sfi <= E; ++sfi) {
+			Iso7816.Response r = tag.readRecord(sfi, 1);
+			boolean findOne = r.isOkey();
+
+			for (int idx = 2; r.isOkey() && idx <= 10; ++idx) {
+				tlvs.add(MARK_LOG, r);
+				r = tag.readRecord(sfi, idx);
+			}
+
+			if (findOne)
+				break;
 		}
 	}
 }
