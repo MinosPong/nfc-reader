@@ -20,4 +20,25 @@ public final class Util {
 		}
 		return new String(ret);
 	}
+	
+	public static int toInt(byte[] b, int s, int n) {
+		int ret = 0;
+
+		final int e = s + n;
+		for (int i = s; i < e; ++i) {
+			ret <<= 8;
+			ret |= b[i] & 0xFF;
+		}
+		return ret;
+	}
+	
+	public static int toIntR(byte[] b, int s, int n) {
+		int ret = 0;
+
+		for (int i = s; (i >= 0 && n > 0); --i, --n) {
+			ret <<= 8;
+			ret |= b[i] & 0xFF;
+		}
+		return ret;
+	}
 }

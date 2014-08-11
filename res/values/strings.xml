@@ -35,4 +35,20 @@
     <string name="spec_prop_translog">Transaction Logs:</string>
     <string name="spec_prop_access">Access denied</string>
     <string name="spec_prop_exception">Error:</string>
+    <string name="spec_cur_unknown"></string>
+    <string name="spec_cur_usd">USD</string>
+    <string name="spec_cur_cny">CNY</string>
+    <string name="spec_cur_hkd">HKD</string>
+    <string name="spec_app_unknown">Unknown Application</string>
+    <string name="spec_app_shenzhentong">Shenzhen Tong</string>
+    <string name="spec_app_quickpass">QuickPass (China UnionPay)</string>
+    <string name="spec_app_octopus_hk">Octopus Card (Hong Kong)</string>
+    <string name="spec_app_changantong">Changan Tong</string>
+    <string name="spec_app_dongguantong">Dongguan Tong</string>
+    <string name="spec_app_wuhantong">Wuhan City Smart Card</string>
+    <string name="spec_app_beijing">Beijing Municipal Card</string>
+    <string name="spec_app_shanghai">Shanghai Card</string>
+    <string name="spec_app_debit">Debit Card</string>
+    <string name="spec_app_credit">Credit Card</string>
+    <string name="spec_app_qcredit">Quasi-credit cards</string>
 </resources>
