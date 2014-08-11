@@ -34,6 +34,38 @@ public class Iso7816 {
 		return data.length;
 	}
 	
+	public boolean match(byte[] bytes) {
+		return match(bytes, 0);
+	}
+
+	public boolean match(byte[] bytes, int start) {
+		final byte[] data = this.data;
+		if (data.length <= bytes.length - start) {
+			for (final byte v : data) {
+				if (v != bytes[start++])
+					return false;
+			}
+		} else {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean match(byte tag) {
+		return (data.length == 1 && data[0] == tag);
+	}
+
+	public boolean match(short tag) {
+		final byte[] data = this.data;
+		if (data.length == 2) {
+			final byte d0 = (byte) (0x000000FF & (tag >> 8));
+			final byte d1 = (byte) (0x000000FF & tag);
+			return (data[0] == d0 && data[1] == d1);
+		}
+
+		return (tag >= 0 && tag <= 255) ? match((byte) tag) : false;
+	}
+	
 	public final static class ID extends Iso7816 {
 		public ID(byte... bytes) {
 			super(bytes);
@@ -271,7 +303,37 @@ public class Iso7816 {
 	public final static class BerHouse {
 		final ArrayList<BerTLV> tlvs = new ArrayList<BerTLV>();
 		
-		
+		public BerTLV findFirst(byte tag) {
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag))
+					return tlv;
+
+			return null;
+		}
+
+		public BerTLV findFirst(byte... tag) {
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag))
+					return tlv;
+
+			return null;
+		}
+
+		public BerTLV findFirst(short tag) {
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag))
+					return tlv;
+
+			return null;
+		}
+
+		public BerTLV findFirst(BerT tag) {
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag.getBytes()))
+					return tlv;
+
+			return null;
+		}
 	}
 	
 	public final static class StdTag {

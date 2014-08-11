@@ -34,4 +34,23 @@ public class Quickpass extends StandardPboc {
 	protected HINT readCard(Iso7816.StdTag tag, Card card) throws IOException {
 		final ArrayList<Iso7816.ID> aids = getApplicationIds(tag);
 	}
+	
+	private ArrayList<Iso7816.ID> getApplicationsIds(Iso7816.StdTag tag) throws IOException {
+		final ArrayList<Iso7816.ID> ret = new ArrayList<Iso7816.ID>();
+		
+		// try to read DDF
+		// pboc借记贷记卡-安全部分 7.4.1
+		BerTLV sfi = topTLVs.findFirst(Iso7816.BerT.CLASS_SFI);
+		if(sfi != null && sfi.length() == 1) {
+			final int SFI = sfi.v.toInt();
+			Iso7816.Response r = tag.readRecord(SFI, 1);
+			for(int p = 2; r.isOkey(); ++p) {
+				BerTLV.extractPrimitives(topTLVs, r);
+				r = tag.readRecord(SFI, p);
+			}
+		}
+		
+		// add extracted
+		
+	}
 }
