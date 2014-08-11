@@ -334,6 +334,59 @@ public class Iso7816 {
 
 			return null;
 		}
+		
+		public ArrayList<BerTLV> findAll(byte tag) {
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag))
+					ret.add(tlv);
+
+			return ret;
+		}
+
+		public ArrayList<BerTLV> findAll(byte... tag) {
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag))
+					ret.add(tlv);
+
+			return ret;
+		}
+
+		public ArrayList<BerTLV> findAll(short tag) {
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag))
+					ret.add(tlv);
+
+			return ret;
+		}
+
+		public ArrayList<BerTLV> findAll(BerT tag) {
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
+			for (BerTLV tlv : tlvs)
+				if (tlv.t.match(tag.getBytes()))
+					ret.add(tlv);
+
+			return ret;
+		}
+		
+		public void add(short t, Response v) {
+			tlvs.add(new BerTLV(new BerT(t), new BerL(v.size()), new BerV(v
+					.getBytes())));
+		}
+
+		public void add(short t, byte[] v) {
+			tlvs.add(new BerTLV(new BerT(t), new BerL(v.length), new BerV(v)));
+		}
+
+		public void add(BerT t, byte[] v) {
+			tlvs.add(new BerTLV(t, new BerL(v.length), new BerV(v)));
+		}
+
+		public void add(BerTLV tlv) {
+			tlvs.add(tlv);
+		}
 	}
 	
 	public final static class StdTag {
@@ -364,7 +417,8 @@ public class Iso7816 {
 
 			return new Response(transceive(buff.array()));
 		}
-
+		
+		// select by DF name
 		public Response selectByName(byte... name) throws IOException {
 			ByteBuffer buff = ByteBuffer.allocate(name.length + 6);
 			buff.put((byte) 0x00) // CLA Class
@@ -422,6 +476,18 @@ public class Iso7816 {
 					(byte) 0x00, // Le
 			};
 				return new Response(transceive(cmd));
+		}
+		
+		// pboc借记贷记-卡片部分 B.7.2
+		public Response getData(short tag) throws IOException {
+			final byte[] cmd = {
+					(byte) 0x80, // CLA Class
+					(byte) 0xCA, // INS Instruction
+					(byte) ((tag >> 8) & 0xFF), (byte) (tag & 0xFF),
+					(byte) 0x00, // Le
+			};
+
+			return new Response(transceive(cmd));
 		}
 		
 		// see ISO7816-4 table 5
