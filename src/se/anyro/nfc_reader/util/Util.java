@@ -32,6 +32,15 @@ public final class Util {
 		return ret;
 	}
 	
+	public static int toInt(byte... b) {
+		int ret = 0;
+		for (final byte a : b) {
+			ret <<= 8;
+			ret |= a & 0xFF;
+		}
+		return ret;
+	}
+	
 	public static int toIntR(byte[] b, int s, int n) {
 		int ret = 0;
 

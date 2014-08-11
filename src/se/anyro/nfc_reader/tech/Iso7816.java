@@ -2,8 +2,10 @@ package se.anyro.nfc_reader.tech;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import se.anyro.nfc_reader.util.Util;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
@@ -19,6 +21,19 @@ public class Iso7816 {
 	protected Iso7816(byte[] bytes) {
 		data = (bytes == null) ? Iso7816.EMPTY : bytes; 
 	}
+	
+	public int toInt() {
+		return Util.toInt(getBytes());
+	}
+	
+	public byte[] getBytes() {
+		return data;
+	}
+	
+	public int size() {
+		return data.length;
+	}
+	
 	public final static class ID extends Iso7816 {
 		public ID(byte... bytes) {
 			super(bytes);
@@ -69,6 +84,194 @@ public class Iso7816 {
 			return isOkey() ? Arrays.copyOfRange(data, 0, size())
 					: Response.EMPTY;
 		}
+	}
+	
+	public final static class BerT extends Iso7816 {
+		// tag template
+		public static final byte TMPL_FCP = 0x62; // File Control Parameters
+		public static final byte TMPL_FMD = 0x64; // File Management Data
+		public static final byte TMPL_FCI = 0x6F; // FCP and FMD
+
+		// proprietary information
+		public final static BerT CLASS_PRI = new BerT((byte) 0xA5);
+		// short EF identifier
+		public final static BerT CLASS_SFI = new BerT((byte) 0x88);
+		// dedicated file name
+		public final static BerT CLASS_DFN = new BerT((byte) 0x84);
+		// application data object
+		public final static BerT CLASS_ADO = new BerT((byte) 0x61);
+		// application id
+		public final static BerT CLASS_AID = new BerT((byte) 0x4F);
+
+		// proprietary information
+
+		public static int test(byte[] bytes, int start) {
+			int len = 1;
+			if ((bytes[start] & 0x1F) == 0x1F) {
+				while ((bytes[start + len] & 0x80) == 0x80)
+					++len;
+
+				++len;
+			}
+			return len;
+		}
+
+		public static BerT read(byte[] bytes, int start) {
+			return new BerT(Arrays.copyOfRange(bytes, start,
+					start + test(bytes, start)));
+		}
+
+		public BerT(byte tag) {
+			this(new byte[] { tag });
+		}
+
+		public BerT(short tag) {
+			this(new byte[] { (byte) (0x000000FF & (tag >> 8)),
+					(byte) (0x000000FF & tag) });
+		}
+
+		public BerT(byte[] bytes) {
+			super(bytes);
+		}
+
+		public boolean hasChild() {
+			return ((data[0] & 0x20) == 0x20);
+		}
+
+		public short toShort() {
+			if (size() <= 2) {
+				return (short) Util.toInt(data);
+			}
+			return 0;
+		}
+	}
+
+	public final static class BerL extends Iso7816 {
+		private final int val;
+
+		public static int test(byte[] bytes, int start) {
+			int len = 1;
+			if ((bytes[start] & 0x80) == 0x80) {
+				len += bytes[start] & 0x07;
+			}
+			return len;
+		}
+
+		public static int calc(byte[] bytes, int start) {
+			if ((bytes[start] & 0x80) == 0x80) {
+				int v = 0;
+
+				int e = start + bytes[start] & 0x07;
+				while (++start <= e) {
+					v <<= 8;
+					v |= bytes[start] & 0xFF;
+				}
+
+				return v;
+			}
+
+			return bytes[start];
+		}
+
+		public static BerL read(byte[] bytes, int start) {
+			return new BerL(Arrays.copyOfRange(bytes, start,
+					start + test(bytes, start)));
+		}
+
+		public BerL(byte[] bytes) {
+			super(bytes);
+			val = calc(bytes, 0);
+		}
+
+		public BerL(int len) {
+			super(null);
+			val = len;
+		}
+
+		public int toInt() {
+			return val;
+		}
+	}
+	
+	public final static class BerV extends Iso7816 {
+		public static BerV read(byte[] bytes, int start, int len) {
+			return new BerV(Arrays.copyOfRange(bytes, start, start + len));
+		}
+
+		public BerV(byte[] bytes) {
+			super(bytes);
+		}
+	}
+	
+	public final static class BerTLV extends Iso7816 {
+		
+		public static BerTLV read(Iso7816 obj) {
+			return read(obj.getBytes(), 0);
+		}
+
+		public static BerTLV read(byte[] bytes, int start) {
+			int s = start;
+			final BerT t = BerT.read(bytes, s);
+			s += t.size();
+
+			final BerL l = BerL.read(bytes, s);
+			s += l.size();
+
+			final BerV v = BerV.read(bytes, s, l.toInt());
+			s += v.size();
+
+			final BerTLV tlv = new BerTLV(t, l, v);
+			tlv.data = Arrays.copyOfRange(bytes, start, s);
+
+			return tlv;
+		}
+		
+		public static void extractPrimitives(BerHouse out, Iso7816 obj) {
+			extractPrimitives(out.tlvs, obj.getBytes());
+		}
+
+		public static void extractPrimitives(ArrayList<BerTLV> out, Iso7816 obj) {
+			extractPrimitives(out, obj.getBytes());
+		}
+
+		public static void extractPrimitives(BerHouse out, byte[] data) {
+			extractPrimitives(out.tlvs, data);
+		}
+
+		public static void extractPrimitives(ArrayList<BerTLV> out, byte[] data) {
+
+			int start = 0;
+			int end = data.length - 3;
+			while (start <= end) {
+				final BerTLV tlv = read(data, start);
+				if (tlv.t.hasChild())
+					extractPrimitives(out, tlv.v.getBytes());
+				else
+					out.add(tlv);
+
+				start += tlv.size();
+			}
+		}
+		
+		public final BerT t;
+		public final BerL l;
+		public final BerV v;
+
+		public BerTLV(BerT t, BerL l, BerV v) {
+			this.t = t;
+			this.l = l;
+			this.v = v;
+		}
+
+		public int length() {
+			return l.toInt();
+		}
+	}
+	
+	public final static class BerHouse {
+		final ArrayList<BerTLV> tlvs = new ArrayList<BerTLV>();
+		
+		
 	}
 	
 	public final static class StdTag {
