@@ -1,6 +1,7 @@
 package se.anyro.nfc_reader;
 
 import se.anyro.nfc_reader.bean.Card;
+import se.anyro.nfc_reader.pboc.StandardPboc;
 import se.anyro.nfc_reader.util.Util;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;

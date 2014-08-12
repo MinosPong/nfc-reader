@@ -85,6 +85,94 @@ public class Quickpass extends StandardPboc {
 			parseLogs(app, subTLVs);
 			card.addApplication(app);
 		}
+		return card.isUnknownCard() ? HINT.RESETANDGONEXT : HINT.STOP;
+	}
+	
+	private static void parseLogs(Application app, BerHouse tlvs) {
+		final byte[] rawTemp = BerTLV.getValue(tlvs.findFirst((short)0x9F4F));
+		if(rawTemp == null)
+			return;
+		
+		// temp里面似乎没有value，也就是没有log啊？
+		final ArrayList<BerTLV> temp = BerTLV.extractOptionList(rawTemp);
+		if(temp == null || temp.isEmpty()) 
+			return;
+		
+		final ArrayList<BerTLV> logs = tlvs.findAll(MARK_LOG);
+		
+		final ArrayList<String> ret = new ArrayList<String>(logs.size());
+		for(BerTLV log : logs) {
+			String l = parseLog(temp, log.v.getBytes());
+			if(l != null)
+				ret.add(l);
+		}
+		
+		if(!ret.isEmpty())
+			app.setProperty(SPEC.PROP.TRANSLOG, ret.toArray(new String[ret.size()]));
+	}
+	
+	private static String parseLog(ArrayList<BerTLV> temp, byte[] data) {
+		try {
+			int date = -1, time = -1;
+			int amount = 0, type = -1;
+			
+			int cursor = 0;
+			for(BerTLV f : temp) {
+				final int n = f.length();
+				switch(f.t.toInt()) {
+				case 0x9A:	// 交易日期
+					date = Util.BCDtoInt(data, cursor, n);
+					break;
+				case 0x9F21:	// 交易时间
+					time = Util.BCDtoInt(data, cursor, n);
+					break;
+				case 0x9F02:	// 授权金额
+					amount = Util.BCDtoInt(data, cursor, n);
+					break;
+				case 0x9C:	// 交易类型
+					type = Util.BCDtoInt(data, cursor, n);
+					break;
+				case 0x9F03:	// 其他金额
+				case 0x9F1A:	// 终端国家代码
+				case 0x5F2A:	// 交易货币代码
+				case 0x9F4E:	// 商户名称
+				case 0x9F36:	// 应用交易计数器(ATC)
+				
+				default:
+						break;
+				}
+				cursor += n;
+			}
+			if(amount <= 0)
+				return null;
+			
+			final char sign;
+			switch(type) {
+			case 0:	// 刷卡消费
+			case 1:	// 取现
+			case 8:	// 转账
+			case 9:	// 支付
+			case 20:	// 退款
+			case 40:	// 持卡人账户转账
+				sign = '-';
+				break;
+				
+			default:
+				sign = '+';
+				break;
+			}
+			String sd = (date <= 0) ? "****.**.**" : String.format("20%02d.%02d.%02d", 
+					(date / 10000) % 100, (date / 100) % 100, date % 100);
+			String st = (time <= 0) ? "**:**" : String.format("%02d:%02d",
+					(time / 10000) % 100, (time / 100) % 100);
+			final StringBuilder ret = new StringBuilder();
+			
+			ret.append(String.format("%s %s %c%.2f", sd, st, sign, amount/100f));
+			
+			return ret.toString();
+		} catch(Exception e) {
+			return null;
+		}
 	}
 	
 	private static void parseInfo(Application app, BerHouse tlvs) {

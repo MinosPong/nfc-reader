@@ -292,6 +292,27 @@ public class Iso7816 {
 			}
 		}
 		
+		public static ArrayList<BerTLV> extractOptionList(byte[] data) {
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
+			
+			int start = 0;
+			int end = data.length;
+			while(start < end) {
+				final BerT t = BerT.read(data, start);
+				start += t.size();
+				
+				if(start < end) {
+					BerL l = BerL.read(data, start);
+					start += l.size();
+					
+					if(start <= end) {
+						ret.add(new BerTLV(t, l, null));
+					}
+				}
+			}
+			return ret;
+		}
+		
 		public final BerT t;
 		public final BerL l;
 		public final BerV v;

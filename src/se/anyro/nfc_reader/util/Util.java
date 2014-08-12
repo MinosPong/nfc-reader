@@ -50,4 +50,24 @@ public final class Util {
 		}
 		return ret;
 	}
+	
+	public static int BCDtoInt(byte[] b, int s, int n) {
+		int ret = 0;
+		
+		final int e = s + n;
+		for(int i = s; i < e; i++){
+			int h = (b[i] >> 4) & 0x0F;
+			int l = b[i] & 0x0F;
+			
+			if(h > 9 || l > 9)
+				return -1;
+			
+			ret = ret * 100 + h * 10 + l;
+		}
+		return ret;
+	}
+	
+	public static int BCDtoInt(byte... b) {
+		return BCDtoInt(b, 0, b.length);
+	}
 }
