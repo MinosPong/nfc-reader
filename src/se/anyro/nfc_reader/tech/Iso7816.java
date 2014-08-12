@@ -237,6 +237,13 @@ public class Iso7816 {
 	
 	public final static class BerTLV extends Iso7816 {
 		
+		public static byte[] getValue(BerTLV tlv) {
+			if (tlv == null || tlv.length() == 0)
+				return null;
+
+			return tlv.v.getBytes();
+		}
+		
 		public static BerTLV read(Iso7816 obj) {
 			return read(obj.getBytes(), 0);
 		}

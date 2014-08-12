@@ -6,6 +6,7 @@ public final class SPEC {
 		SERIAL(R.string.spec_prop_serial),
 		PARAM(R.string.spec_prop_param),
 		VERSION(R.string.spec_prop_version),
+		COUNT(R.string.spec_prop_count),
 		DATE(R.string.spec_prop_date),
 		CURRENCY(R.string.spec_prop_currency),
 		BALANCE(R.string.spec_prop_balance),

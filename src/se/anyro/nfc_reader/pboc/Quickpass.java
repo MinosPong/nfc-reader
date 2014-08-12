@@ -9,6 +9,7 @@ import se.anyro.nfc_reader.bean.Card;
 import se.anyro.nfc_reader.tech.Iso7816;
 import se.anyro.nfc_reader.tech.Iso7816.BerHouse;
 import se.anyro.nfc_reader.tech.Iso7816.BerTLV;
+import se.anyro.nfc_reader.util.Util;
 
 public class Quickpass extends StandardPboc {
 	protected final static byte[] DFN_PPSE = { (byte) '2', (byte) 'P',
@@ -87,7 +88,67 @@ public class Quickpass extends StandardPboc {
 	}
 	
 	private static void parseInfo(Application app, BerHouse tlvs) {
+		// 账号
 		Object prop = parseString(tlvs, (short)0x5A);
+		if(prop != null)
+			app.setProperty(SPEC.PROP.SERIAL, prop);
+		
+		prop = parseApplicationName(tlvs, (String)prop);
+		if(prop != null)
+			app.setProperty(SPEC.PROP.ID, prop);
+		
+		prop = parseInteger(tlvs, (short)0x9F08);
+		if(prop != null)
+			app.setProperty(SPEC.PROP.VERSION, prop);
+		
+		// ATC
+		prop = parseInteger(tlvs, (short)0x9F36);
+		if(prop != null)
+			app.setProperty(SPEC.PROP.COUNT, prop);
+		
+		prop = parseValidity(tlvs, (short)0x5F25, (short)0x5F24);
+		if(prop != null)
+			app.setProperty(SPEC.PROP.DATE, prop);
+	}
+	
+	private static SPEC.APP parseApplicationName(BerHouse tlvs, String serial) {
+		// 0x84是什么tag?
+		String f = parseString(tlvs, (short)0x84);
+		if(f != null) {
+			if(f.endsWith("010101"))
+				return SPEC.APP.DEBIT;
+			
+			if(f.endsWith("010102"))
+				return SPEC.APP.CREDIT;
+			
+			if(f.endsWith("010103"))
+				return SPEC.APP.QCREDIT;
+		}
+		return SPEC.APP.UNKNOWN;
+	}
+	
+	private static String parseString(BerHouse tlvs, short tag) {
+		final byte[] v = BerTLV.getValue(tlvs.findFirst(tag));
+		return (v != null) ? Util.toHexString(v) : null;
+	}
+	
+	private static Integer parseInteger(BerHouse tlvs, short tag) {
+		final byte[] v = BerTLV.getValue(tlvs.findFirst(tag));
+		return (v != null) ? Util.toInt(v) : null;
+	}
+	
+	private static String parseValidity(BerHouse tlvs, short from, short to) {
+		final byte[] f = BerTLV.getValue(tlvs.findFirst(from));
+		final byte[] t = BerTLV.getValue(tlvs.findFirst(to));
+		
+		if(t == null || t.length != 3 || t[0] == 0 || t[0] == (byte)0xFF)
+			return null;
+		
+		if(f == null || f.length != 3 || f[0] == 0 || f[0] == (byte)0xFF)
+			return String.format("? - 20%02x.%02x.%02x", t[0], t[1], t[2]);
+		
+		return String.format("20%02x.%02x.%02x - 20%02x.%02x.%02x", f[0], f[1],
+				f[2], t[0], t[1], t[2]);
 	}
 	
 	private ArrayList<Iso7816.ID> getApplicationIds(Iso7816.StdTag tag) throws IOException {
