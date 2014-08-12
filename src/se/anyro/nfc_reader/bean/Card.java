@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import se.anyro.nfc_reader.SPEC;
 
 public class Card extends Application {
-	public final static Card Empty = new Card();
+	public final static Card EMPTY = new Card();
 	
 	private final ArrayList<Application> applications;
 	
@@ -17,11 +17,11 @@ public class Card extends Application {
 		return (Exception)getProperty(SPEC.PROP.EXCEPTION);
 	}
 	
-	public boolean hasReadingExcption() {
+	public boolean hasReadingException() {
 		return hasProperty(SPEC.PROP.EXCEPTION);
 	}
 	
-	public boolean isUnknownCard() {
+	public final boolean isUnknownCard() {
 		return applicationCount() == 0;
 	}
 	

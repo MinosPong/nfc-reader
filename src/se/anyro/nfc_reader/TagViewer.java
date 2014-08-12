@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import se.anyro.nfc_reader.bean.Application;
 import se.anyro.nfc_reader.bean.Card;
 import se.anyro.nfc_reader.record.ParsedNdefRecord;
 import android.app.Activity;
@@ -39,6 +40,7 @@ import android.nfc.tech.MifareUltralight;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -157,9 +159,13 @@ public class TagViewer extends Activity {
                 // Unknown tag type
                 byte[] empty = new byte[0];
                 byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
-                Parcelable tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                final Tag tag = (Tag)intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 byte[] payload = dumpTagData(tag).getBytes();
-                Card card = ReaderManager.readCard((Tag)tag);
+                Card card = ReaderManager.readCard(tag);
+                for(int index = 0; index < card.applicationCount(); index++) {
+                	Application app = card.getApplication(index);
+                	Log.i("yz", "Serial:" + app.getStringProperty(SPEC.PROP.SERIAL));
+                }
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, id, payload);
                 NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
                 msgs = new NdefMessage[] { msg };

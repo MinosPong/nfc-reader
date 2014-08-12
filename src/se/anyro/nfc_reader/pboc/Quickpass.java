@@ -40,7 +40,7 @@ public class Quickpass extends StandardPboc {
 	
 	private final BerHouse topTLVs = new BerHouse();
 	
-	protected boolean resettag(Iso7816.StdTag tag) throws IOException {
+	protected boolean resetTag(Iso7816.StdTag tag) throws IOException {
 		Iso7816.Response rsp = tag.selectByName(DFN_PPSE);
 		if (!rsp.isOkey())
 			return false;
@@ -93,7 +93,7 @@ public class Quickpass extends StandardPboc {
 		if(rawTemp == null)
 			return;
 		
-		// temp里面似乎没有value，也就是没有log啊？
+		// temp里面没有value，也就没包括log，log是通过下面的MARK_LOG找到的
 		final ArrayList<BerTLV> temp = BerTLV.extractOptionList(rawTemp);
 		if(temp == null || temp.isEmpty()) 
 			return;

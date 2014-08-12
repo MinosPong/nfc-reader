@@ -29,6 +29,7 @@ public abstract class StandardPboc {
 				
 				switch(hint) {
 				case RESETANDGONEXT:
+					Log.i("yz", reader.getClass().getName());
 					if(!reader.resetTag(tag)) {
 						continue;
 					}
