@@ -198,6 +198,7 @@ public class Quickpass extends StandardPboc {
 		if(prop != null)
 			app.setProperty(SPEC.PROP.DATE, prop);
 		
+		prop = parseCurrency(tlvs, (short) 0x9F51);
 		if (prop != null)
 			app.setProperty(SPEC.PROP.CURRENCY, prop);
 
@@ -228,6 +229,10 @@ public class Quickpass extends StandardPboc {
 				return SPEC.APP.QCREDIT;
 		}
 		return SPEC.APP.UNKNOWN;
+	}
+	
+	private static SPEC.CUR parseCurrency(BerHouse tlvs, short tag) {
+		return SPEC.CUR.CNY;
 	}
 	
 	private static String parseString(BerHouse tlvs, short tag) {

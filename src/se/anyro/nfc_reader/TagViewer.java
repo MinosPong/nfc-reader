@@ -175,7 +175,7 @@ public class TagViewer extends Activity {
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, id, payload);
                 NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
                 NdefMessage msgCard = new NdefMessage(records);
-                msgs = new NdefMessage[] { msg, msgCard };
+                msgs = new NdefMessage[] { msgCard, msg };
             }
             // Setup the views
             buildTagViews(msgs);
@@ -276,7 +276,39 @@ public class TagViewer extends Activity {
     		sb.append("Transactions:")
     		.append(app.getProperty(SPEC.PROP.COUNT))
     		.append("\n");
-    		
+    	
+    	Float balance = (Float)app.getProperty(SPEC.PROP.ECASH);
+    	if(balance != null && !balance.isNaN()) {
+    		sb.append("E-Cash:")
+    		.append(String.format("%.2f ", balance))
+    		.append(app.getProperty(SPEC.PROP.CURRENCY))
+    		.append("\n");
+    	}
+    	
+    	balance = (Float)app.getProperty(SPEC.PROP.TLIMIT);
+    	if(balance != null && !balance.isNaN()) {
+    		sb.append("EC Single Transaction Limit:")
+    		.append(String.format("%.2f %s", balance, app.getProperty(SPEC.PROP.CURRENCY)))
+    		.append("\n");
+    	}
+    	
+    	balance = (Float)app.getProperty(SPEC.PROP.DLIMIT);
+    	if(balance != null && !balance.isNaN()) {
+    		sb.append("EC Balance Limit:")
+    		.append(String.format("%.2f %s", balance, app.getProperty(SPEC.PROP.CURRENCY)))
+    		.append("\n");
+    	}
+    	
+    	balance = (Float)app.getProperty(SPEC.PROP.BALANCE);
+    	if(balance != null) {
+    		sb.append("Balance:");
+    		if(balance.isNaN()){
+    			sb.append("Acess denied\n");
+    		} else {
+    			sb.append(String.format("%.2f %s", balance, app.getProperty(SPEC.PROP.CURRENCY)))
+    			.append("\n");
+    		}
+    	}
     	
     	return sb.toString();
     }
@@ -328,7 +360,7 @@ public class TagViewer extends Activity {
         // Build views for all of the sub records
         Date now = new Date();
         for(int j = 0; j < msgs.length; j++){
-        	List<ParsedNdefRecord> records = NdefMessageParser.parse(msgs[0]);
+        	List<ParsedNdefRecord> records = NdefMessageParser.parse(msgs[j]);
         	final int size = records.size();
         	for (int i = 0; i < size; i++) {
         		TextView timeView = new TextView(this);
