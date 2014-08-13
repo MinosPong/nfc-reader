@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="app_name">NFC Reader</string>
-    <string name="intro_message">This is a simple app to read various tags (NDEF, RFID, FeliCa, ISO 14443, etc).\n\nYou use it by holding a tag/card against the back of your device.\n\nThis app is based on adam's:https://github.com/nadam/nfc-reader and https://code.google.com/p/nfcard/\n\n This app is on:https://github.com/fightyz</string>
+    <string name="intro_message">This is a simple app to read various tags (NDEF, RFID, FeliCa, ISO 14443, etc).\n\nYou use it by holding a tag/card against the back of your device.\n\nThis app is based on adam\'s:https://github.com/nadam/nfc-reader and https://code.google.com/p/nfcard/\n\n This app\'s code is on:https://github.com/fightyz/nfc-reader</string>
     <string name="error">Error</string>
     <string name="no_nfc">No NFC found on this device</string>
     <string name="nfc_disabled">NFC is not enabled. Please go to the wireless settings to enable it.</string>
