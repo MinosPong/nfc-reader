@@ -162,13 +162,20 @@ public class TagViewer extends Activity {
                 final Tag tag = (Tag)intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 byte[] payload = dumpTagData(tag).getBytes();
                 Card card = ReaderManager.readCard(tag);
-                for(int index = 0; index < card.applicationCount(); index++) {
+                int count = card.applicationCount();
+                byte[][] payloadInfo;
+                payloadInfo = new byte[count][];
+                NdefRecord[] records = new NdefRecord[count];
+                for(int index = 0; index < count; index++) {
                 	Application app = card.getApplication(index);
-                	Log.i("yz", "Serial:" + app.getStringProperty(SPEC.PROP.SERIAL));
+                	payloadInfo[index] = dumpCardData(app).getBytes();
+                	records[index] = 
+                			new NdefRecord(NdefRecord.TNF_UNKNOWN,empty, id, payloadInfo[index]);
                 }
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, id, payload);
                 NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
-                msgs = new NdefMessage[] { msg };
+                NdefMessage msgCard = new NdefMessage(records);
+                msgs = new NdefMessage[] { msg, msgCard };
             }
             // Setup the views
             buildTagViews(msgs);
@@ -241,6 +248,38 @@ public class TagViewer extends Activity {
 
         return sb.toString();
     }
+    
+    private String dumpCardData(Application app) {
+    	StringBuilder sb = new StringBuilder();
+    	
+    	if(app.hasProperty(SPEC.PROP.SERIAL))
+    		sb.append("Serial:")
+    		.append(app.getProperty(SPEC.PROP.SERIAL))
+    		.append("\n");
+    	
+    	if(app.hasProperty(SPEC.PROP.VERSION))
+    		sb.append("Version:")
+    		.append(app.getProperty(SPEC.PROP.VERSION))
+    		.append("\n");
+    	
+    	if(app.hasProperty(SPEC.PROP.ID))
+    		sb.append("Application:")
+    		.append(app.getProperty(SPEC.PROP.ID))
+    		.append("\n");
+    	
+    	if(app.hasProperty(SPEC.PROP.DATE))
+    		sb.append("Date:")
+    		.append(app.getProperty(SPEC.PROP.DATE))
+    		.append("\n");
+    	
+    	if(app.hasProperty(SPEC.PROP.COUNT))
+    		sb.append("Transactions:")
+    		.append(app.getProperty(SPEC.PROP.COUNT))
+    		.append("\n");
+    		
+    	
+    	return sb.toString();
+    }
 
     private String getHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
@@ -288,15 +327,17 @@ public class TagViewer extends Activity {
         // Parse the first message in the list
         // Build views for all of the sub records
         Date now = new Date();
-        List<ParsedNdefRecord> records = NdefMessageParser.parse(msgs[0]);
-        final int size = records.size();
-        for (int i = 0; i < size; i++) {
-            TextView timeView = new TextView(this);
-            timeView.setText(TIME_FORMAT.format(now));
-            content.addView(timeView, 0);
-            ParsedNdefRecord record = records.get(i);
-            content.addView(record.getView(this, inflater, content, i), 1 + i);
-            content.addView(inflater.inflate(R.layout.tag_divider, content, false), 2 + i);
+        for(int j = 0; j < msgs.length; j++){
+        	List<ParsedNdefRecord> records = NdefMessageParser.parse(msgs[0]);
+        	final int size = records.size();
+        	for (int i = 0; i < size; i++) {
+        		TextView timeView = new TextView(this);
+        		timeView.setText(TIME_FORMAT.format(now));
+        		content.addView(timeView, 0);
+        		ParsedNdefRecord record = records.get(i);
+        		content.addView(record.getView(this, inflater, content, i), 1 + i);
+        		content.addView(inflater.inflate(R.layout.tag_divider, content, false), 2 + i);
+        	}
         }
     }
 

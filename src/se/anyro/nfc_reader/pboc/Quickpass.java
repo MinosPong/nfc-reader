@@ -197,6 +197,21 @@ public class Quickpass extends StandardPboc {
 		prop = parseValidity(tlvs, (short)0x5F25, (short)0x5F24);
 		if(prop != null)
 			app.setProperty(SPEC.PROP.DATE, prop);
+		
+		if (prop != null)
+			app.setProperty(SPEC.PROP.CURRENCY, prop);
+
+		prop = parseAmount(tlvs, (short) 0x9F77);
+		if (prop != null)
+			app.setProperty(SPEC.PROP.DLIMIT, prop);
+
+		prop = parseAmount(tlvs, (short) 0x9F78);
+		if (prop != null)
+			app.setProperty(SPEC.PROP.TLIMIT, prop);
+
+		prop = parseAmount(tlvs, (short) 0x9F79);
+		if (prop != null)
+			app.setProperty(SPEC.PROP.ECASH, prop);
 	}
 	
 	private static SPEC.APP parseApplicationName(BerHouse tlvs, String serial) {
@@ -220,9 +235,19 @@ public class Quickpass extends StandardPboc {
 		return (v != null) ? Util.toHexString(v) : null;
 	}
 	
+	private static Float parseAmount(BerHouse tlvs, short tag) {
+		Integer v = parseIntegerBCD(tlvs, tag);
+		return (v != null) ? v / 100.0f : null;
+	}
+	
 	private static Integer parseInteger(BerHouse tlvs, short tag) {
 		final byte[] v = BerTLV.getValue(tlvs.findFirst(tag));
 		return (v != null) ? Util.toInt(v) : null;
+	}
+	
+	private static Integer parseIntegerBCD(BerHouse tlvs, short tag) {
+		final byte[] v = BerTLV.getValue(tlvs.findFirst(tag));
+		return (v != null) ? Util.BCDtoInt(v) : null;
 	}
 	
 	private static String parseValidity(BerHouse tlvs, short from, short to) {
