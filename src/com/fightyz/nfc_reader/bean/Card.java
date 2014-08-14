@@ -1,8 +1,8 @@
-package se.anyro.nfc_reader.bean;
+package com.fightyz.nfc_reader.bean;
 
 import java.util.ArrayList;
 
-import se.anyro.nfc_reader.SPEC;
+import com.fightyz.nfc_reader.SPEC;
 
 public class Card extends Application {
 	public final static Card EMPTY = new Card();

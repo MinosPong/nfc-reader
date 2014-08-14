@@ -1,4 +1,4 @@
-package se.anyro.nfc_reader.util;
+package com.fightyz.nfc_reader.util;
 
 public final class Util {
 	private final static char[] HEX = { '0', '1', '2', '3', '4',

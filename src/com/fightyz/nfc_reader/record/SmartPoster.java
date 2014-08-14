@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.anyro.nfc_reader.record;
+package com.fightyz.nfc_reader.record;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-import se.anyro.nfc_reader.NdefMessageParser;
-import se.anyro.nfc_reader.R;
+import com.fightyz.nfc_reader.R;
 import android.app.Activity;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
@@ -30,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 
+import com.fightyz.nfc_reader.NdefMessageParser;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;

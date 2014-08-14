@@ -1,6 +1,7 @@
-package se.anyro.nfc_reader.bean;
+package com.fightyz.nfc_reader.bean;
 
-import se.anyro.nfc_reader.SPEC;
+import com.fightyz.nfc_reader.SPEC;
+
 import android.util.SparseArray;
 
 public class Application {

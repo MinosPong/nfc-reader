@@ -1,4 +1,6 @@
-package se.anyro.nfc_reader;
+package com.fightyz.nfc_reader;
+
+import com.fightyz.nfc_reader.R;
 
 public final class SPEC {
 	public enum PROP {

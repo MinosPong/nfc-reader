@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- * Copyright (C) 2011 Adam Nyb��ck
+ * Copyright (C) 2011 Adam Nyb??????ck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.anyro.nfc_reader;
+package com.fightyz.nfc_reader;
 
 import java.nio.charset.Charset;
 import java.text.DateFormat;
@@ -23,9 +23,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import se.anyro.nfc_reader.bean.Application;
-import se.anyro.nfc_reader.bean.Card;
-import se.anyro.nfc_reader.record.ParsedNdefRecord;
+import com.fightyz.nfc_reader.bean.Application;
+import com.fightyz.nfc_reader.bean.Card;
+import com.fightyz.nfc_reader.record.ParsedNdefRecord;
+
+import com.fightyz.nfc_reader.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;

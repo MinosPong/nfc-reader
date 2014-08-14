@@ -13,15 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package se.anyro.nfc_reader;
+package com.fightyz.nfc_reader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import se.anyro.nfc_reader.record.ParsedNdefRecord;
-import se.anyro.nfc_reader.record.SmartPoster;
-import se.anyro.nfc_reader.record.TextRecord;
-import se.anyro.nfc_reader.record.UriRecord;
+import com.fightyz.nfc_reader.record.ParsedNdefRecord;
+import com.fightyz.nfc_reader.record.SmartPoster;
+import com.fightyz.nfc_reader.record.TextRecord;
+import com.fightyz.nfc_reader.record.UriRecord;
+
+import com.fightyz.nfc_reader.R;
 import android.app.Activity;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;

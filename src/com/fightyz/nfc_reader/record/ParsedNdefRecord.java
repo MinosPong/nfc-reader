@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.anyro.nfc_reader.record;
+package com.fightyz.nfc_reader.record;
 
 import android.app.Activity;
 import android.view.LayoutInflater;

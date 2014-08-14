@@ -1,16 +1,17 @@
-package se.anyro.nfc_reader.pboc;
+package com.fightyz.nfc_reader.pboc;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.fightyz.nfc_reader.SPEC;
+import com.fightyz.nfc_reader.bean.Application;
+import com.fightyz.nfc_reader.bean.Card;
+import com.fightyz.nfc_reader.tech.Iso7816;
+import com.fightyz.nfc_reader.util.Util;
+
 import android.nfc.tech.IsoDep;
 import android.util.Log;
-import se.anyro.nfc_reader.SPEC;
-import se.anyro.nfc_reader.bean.Application;
-import se.anyro.nfc_reader.bean.Card;
-import se.anyro.nfc_reader.tech.Iso7816;
-import se.anyro.nfc_reader.util.Util;
 
 public abstract class StandardPboc {
 	private static Class<?>[][] readers = { {Quickpass.class, } };
@@ -243,7 +244,7 @@ public abstract class StandardPboc {
 		protected final static byte[] DFI_MF = { (byte) 0x3F, (byte) 0x00 };
 		protected final static byte[] DFI_EP = { (byte) 0x10, (byte) 0x01 };
 
-	// select by DF name: 1PAY.SYS.DDF01这个是接触式的, 2PAY.SYS.DDF01是非接触的，在Quickpass里就用的非接
+	// select by DF name: 1PAY.SYS.DDF01?????????????????????, 2PAY.SYS.DDF01?????????????????????Quickpass??????????????????
 	protected final static byte[] DFN_PSE = { (byte) '1', (byte) 'P',
 			(byte) 'A', (byte) 'Y', (byte) '.', (byte) 'S', (byte) 'Y',
 			(byte) 'S', (byte) '.', (byte) 'D', (byte) 'D', (byte) 'F',

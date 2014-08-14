@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.anyro.nfc_reader.record;
+package com.fightyz.nfc_reader.record;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import se.anyro.nfc_reader.R;
+import com.fightyz.nfc_reader.R;
 import android.app.Activity;
 import android.net.Uri;
 import android.nfc.NdefRecord;
