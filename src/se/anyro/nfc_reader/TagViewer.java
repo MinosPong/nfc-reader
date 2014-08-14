@@ -310,6 +310,15 @@ public class TagViewer extends Activity {
     		}
     	}
     	
+    	String[] logs = (String[]) app.getProperty(SPEC.PROP.TRANSLOG);
+    	if(logs != null && logs.length > 0) {
+    		sb.append("TansLog:");
+    		for(String log : logs) {
+    			sb.append(log)
+    			.append("\n");
+    		}
+    	}
+    	
     	return sb.toString();
     }
 
